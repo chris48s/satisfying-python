@@ -5,13 +5,12 @@ on:
     # At 07:00 on Saturday
   workflow_dispatch:
 
-permissions:
-  pull-requests: write
-  contents: write
-
 jobs:
-  update-github-api:
+  update-python-versions:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
