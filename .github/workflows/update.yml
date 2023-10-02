@@ -21,11 +21,6 @@ jobs:
           sudo apt-get -qq update
           sudo apt-get install -y curl jq
 
-      - name: Setup
-        uses: ./.github/actions/setup
-        with:
-          node-version: 20
-
       - name: Check for new python versions
         run: curl "https://endoflife.date/api/python.json" | jq [.[].cycle] > src/versions.json
 
