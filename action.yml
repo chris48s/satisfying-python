@@ -1,0 +1,13 @@
+name: 'Satisfying Python'
+description: 'Output maximum and minimum python versions satisfying constraint from pyproject.toml'
+branding:
+  icon: 'info'
+  color: 'blue'
+outputs:
+  max:
+    description: "Maximum satisfying python version"
+  min:
+    description: "Minimum satisfying python version"
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
