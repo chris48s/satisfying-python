@@ -5,7 +5,7 @@
 
 Github action that outputs the maximum (`outputs.max`) and minimum (`outputs.min`) python versions satisfying a range from `pyproject.toml`.
 
-PEP 621 and poetry formats are supported.
+[PEP 621](https://packaging.python.org/en/latest/specifications/declaring-project-metadata/#declaring-project-metadata) and [Poetry](https://python-poetry.org/) formats are supported.
 
 Example usage:
 
