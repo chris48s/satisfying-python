@@ -17,5 +17,5 @@ Example usage:
 - name: Set up Python ${{ steps.python-versions.outputs.min }}
   uses: actions/setup-python@v4
   with:
-    python-version: ${{ steps.python-versions.outputs.min }}
+    python-version: '${{ steps.python-versions.outputs.min }}'
 ```
