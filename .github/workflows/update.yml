@@ -21,7 +21,7 @@ jobs:
           sudo apt-get install -y curl jq
 
       - name: Check for new python versions
-        run: curl "https://endoflife.date/api/python.json" | jq [.[].cycle] > src/versions.json
+        run: ./src/update-versions.sh
 
       - name: Create Pull Request if new versions available
         uses: peter-evans/create-pull-request@v5
