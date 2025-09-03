@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "1.11.1",
-    "@renovatebot/pep440": "4.1.0",
+    "@renovatebot/pep440": "4.2.0",
     "smol-toml": "1.4.2"
   },
   "devDependencies": {
