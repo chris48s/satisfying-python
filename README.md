@@ -11,7 +11,7 @@ Example usage:
 
 ```yaml
 - name: Get python versions
-  uses: chris48s/satisfying-python@0.1.0
+  uses: chris48s/satisfying-python@0.2.0
   id: python-versions
 
 - name: Set up Python ${{ steps.python-versions.outputs.min }}
