@@ -50,10 +50,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Install Node JS 20
+      - name: Install Node JS 24
         uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install
         run: npm ci
