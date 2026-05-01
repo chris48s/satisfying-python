@@ -20,7 +20,7 @@
   "author": "chris48s",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "3.0.0",
+    "@actions/core": "3.0.1",
     "@renovatebot/pep440": "4.2.2",
     "smol-toml": "1.6.1"
   },
