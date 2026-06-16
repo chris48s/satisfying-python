@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import pep440 from "@renovatebot/pep440";
+import { maxSatisfying, minSatisfying } from "@renovatebot/pep440";
 import { parse } from "smol-toml";
 import versions from "./versions.json" with { type: "json" };
 
@@ -14,7 +14,7 @@ export default async function resolve(filename = "./pyproject.toml") {
     );
   }
   return {
-    max: pep440.maxSatisfying(versions, constraint),
-    min: pep440.minSatisfying(versions, constraint),
+    max: maxSatisfying(versions, constraint),
+    min: minSatisfying(versions, constraint),
   };
 }
