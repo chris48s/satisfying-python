@@ -28,62 +28,6 @@ import{createRequire as e}from"module";var A={770:(e,A,t)=>{t(218)},218:(e,A,t)=
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-function getLineColFromPtr(e,A){let t=e.slice(0,A).split(/\r\n|\n|\r/g);return[t.length,t.pop().length+1]}function makeCodeBlock(e,A,t){let r=e.split(/\r\n|\n|\r/g);let s="";let n=(Math.log10(A+1)|0)+1;for(let e=A-1;e<=A+1;e++){let o=r[e-1];if(!o)continue;s+=e.toString().padEnd(n," ");s+=":  ";s+=o;s+="\n";if(e===A){s+=" ".repeat(n+t+2);s+="^\n"}}return s}class TomlError extends Error{line;column;codeblock;constructor(e,A){const[t,r]=getLineColFromPtr(A.toml,A.ptr);const s=makeCodeBlock(A.toml,t,r);super(`Invalid TOML document: ${e}\n\n${s}`,A);this.line=t;this.column=r;this.codeblock=s}}
-/*!
- * Copyright (c) Squirrel Chat et al., All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its contributors
- *    may be used to endorse or promote products derived from this software without
- *    specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-function isEscaped(e,A){let t=0;while(e[A-++t]==="\\");return--t&&t%2}function indexOfNewline(e,A=0,t=e.length){let r=e.indexOf("\n",A);if(e[r-1]==="\r")r--;return r<=t?r:-1}function skipComment(e,A){for(let t=A;t<e.length;t++){let r=e[t];if(r==="\n")return t;if(r==="\r"&&e[t+1]==="\n")return t+1;if(r<" "&&r!=="\t"||r===""){throw new TomlError("control characters are not allowed in comments",{toml:e,ptr:A})}}return e.length}function skipVoid(e,A,t,r){let s;while(1){while((s=e[A])===" "||s==="\t"||!t&&(s==="\n"||s==="\r"&&e[A+1]==="\n"))A++;if(r||s!=="#")break;A=skipComment(e,A)}return A}function skipUntil(e,A,t,r,s=false){if(!r){A=indexOfNewline(e,A);return A<0?e.length:A}for(let n=A;n<e.length;n++){let A=e[n];if(A==="#"){n=indexOfNewline(e,n)}else if(A===t){return n+1}else if(A===r||s&&(A==="\n"||A==="\r"&&e[n+1]==="\n")){return n}}throw new TomlError("cannot find end of structure",{toml:e,ptr:A})}function getStringEnd(e,A){let t=e[A];let r=t===e[A+1]&&e[A+1]===e[A+2]?e.slice(A,A+3):t;A+=r.length-1;do{A=e.indexOf(r,++A)}while(A>-1&&t!=="'"&&isEscaped(e,A));if(A>-1){A+=r.length;if(r.length>1){if(e[A]===t)A++;if(e[A]===t)A++}}return A}
-/*!
- * Copyright (c) Squirrel Chat et al., All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holder nor the names of its contributors
- *    may be used to endorse or promote products derived from this software without
- *    specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 let we=/^(\d{4}-\d{2}-\d{2})?[T ]?(?:(\d{2}):\d{2}(?::\d{2}(?:\.\d+)?)?)?(Z|[-+]\d{2}:\d{2})?$/i;class TomlDate extends Date{#he=false;#Ce=false;#ue=null;constructor(e){let A=true;let t=true;let r="Z";if(typeof e==="string"){let s=e.match(we);if(s){if(!s[1]){A=false;e=`0000-01-01T${e}`}t=!!s[2];t&&e[10]===" "&&(e=e.replace(" ","T"));if(s[2]&&+s[2]>23){e=""}else{r=s[3]||null;e=e.toUpperCase();if(!r&&t)e+="Z"}}else{e=""}}super(e);if(!isNaN(this.getTime())){this.#he=A;this.#Ce=t;this.#ue=r}}isDateTime(){return this.#he&&this.#Ce}isLocal(){return!this.#he||!this.#Ce||!this.#ue}isDate(){return this.#he&&!this.#Ce}isTime(){return this.#Ce&&!this.#he}isValid(){return this.#he||this.#Ce}toISOString(){let e=super.toISOString();if(this.isDate())return e.slice(0,10);if(this.isTime())return e.slice(11,23);if(this.#ue===null)return e.slice(0,-1);if(this.#ue==="Z")return e;let A=+this.#ue.slice(1,3)*60+ +this.#ue.slice(4,6);A=this.#ue[0]==="-"?A:-A;let t=new Date(this.getTime()-A*6e4);return t.toISOString().slice(0,-1)+this.#ue}static wrapAsOffsetDateTime(e,A="Z"){let t=new TomlDate(e);t.#ue=A;return t}static wrapAsLocalDateTime(e){let A=new TomlDate(e);A.#ue=null;return A}static wrapAsLocalDate(e){let A=new TomlDate(e);A.#Ce=false;A.#ue=null;return A}static wrapAsLocalTime(e){let A=new TomlDate(e);A.#he=false;A.#ue=null;return A}}
 /*!
  * Copyright (c) Squirrel Chat et al., All rights reserved.
@@ -112,7 +56,7 @@ let we=/^(\d{4}-\d{2}-\d{2})?[T ]?(?:(\d{2}):\d{2}(?::\d{2}(?:\.\d+)?)?)?(Z|[-+]
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-let ye=/^((0x[0-9a-fA-F](_?[0-9a-fA-F])*)|(([+-]|0[ob])?\d(_?\d)*))$/;let me=/^[+-]?\d(_?\d)*(\.\d(_?\d)*)?([eE][+-]?\d(_?\d)*)?$/;let De=/^[+-]?0[0-9_]/;let ke=/^[0-9a-f]{2,8}$/i;let Re={b:"\b",t:"\t",n:"\n",f:"\f",r:"\r",e:"",'"':'"',"\\":"\\"};function parseString(e,A=0,t=e.length){let r=e[A]==="'";let s=e[A++]===e[A]&&e[A]===e[A+1];if(s){t-=2;if(e[A+=2]==="\r")A++;if(e[A]==="\n")A++}let n=0;let o;let i="";let a=A;while(A<t-1){let t=e[A++];if(t==="\n"||t==="\r"&&e[A]==="\n"){if(!s){throw new TomlError("newlines are not allowed in strings",{toml:e,ptr:A-1})}}else if(t<" "&&t!=="\t"||t===""){throw new TomlError("control characters are not allowed in strings",{toml:e,ptr:A-1})}if(o){o=false;if(t==="x"||t==="u"||t==="U"){let r=e.slice(A,A+=t==="x"?2:t==="u"?4:8);if(!ke.test(r)){throw new TomlError("invalid unicode escape",{toml:e,ptr:n})}try{i+=String.fromCodePoint(parseInt(r,16))}catch{throw new TomlError("invalid unicode escape",{toml:e,ptr:n})}}else if(s&&(t==="\n"||t===" "||t==="\t"||t==="\r")){A=skipVoid(e,A-1,true);if(e[A]!=="\n"&&e[A]!=="\r"){throw new TomlError("invalid escape: only line-ending whitespace may be escaped",{toml:e,ptr:n})}A=skipVoid(e,A)}else if(t in Re){i+=Re[t]}else{throw new TomlError("unrecognized escape sequence",{toml:e,ptr:n})}a=A}else if(!r&&t==="\\"){n=A-1;o=true;i+=e.slice(a,n)}}return i+e.slice(a,t-1)}function parseValue(e,A,t,r){if(e==="true")return true;if(e==="false")return false;if(e==="-inf")return-Infinity;if(e==="inf"||e==="+inf")return Infinity;if(e==="nan"||e==="+nan"||e==="-nan")return NaN;if(e==="-0")return r?0n:0;let s=ye.test(e);if(s||me.test(e)){if(De.test(e)){throw new TomlError("leading zeroes are not allowed",{toml:A,ptr:t})}e=e.replace(/_/g,"");let n=+e;if(isNaN(n)){throw new TomlError("invalid number",{toml:A,ptr:t})}if(s){if((s=!Number.isSafeInteger(n))&&!r){throw new TomlError("integer value cannot be represented losslessly",{toml:A,ptr:t})}if(s||r===true)n=BigInt(e)}return n}const n=new TomlDate(e);if(!n.isValid()){throw new TomlError("invalid value",{toml:A,ptr:t})}return n}
+function getLineColFromPtr(e,A){let t=e.slice(0,A).split(/\r\n|\n|\r/g);return[t.length,t.pop().length+1]}function makeCodeBlock(e,A,t){let r=e.split(/\r\n|\n|\r/g);let s="";let n=(Math.log10(A+1)|0)+1;for(let e=A-1;e<=A+1;e++){let o=r[e-1];if(!o)continue;s+=e.toString().padEnd(n," ");s+=":  ";s+=o;s+="\n";if(e===A){s+=" ".repeat(n+t+2);s+="^\n"}}return s}class TomlError extends Error{line;column;codeblock;constructor(e,A){const[t,r]=getLineColFromPtr(A.toml,A.ptr);const s=makeCodeBlock(A.toml,t,r);super(`Invalid TOML document: ${e}\n\n${s}`,A);this.line=t;this.column=r;this.codeblock=s}}
 /*!
  * Copyright (c) Squirrel Chat et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -140,7 +84,7 @@ let ye=/^((0x[0-9a-fA-F](_?[0-9a-fA-F])*)|(([+-]|0[ob])?\d(_?\d)*))$/;let me=/^[
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-function sliceAndTrimEndOf(e,A,t){let r=e.slice(A,t);let s=r.indexOf("#");if(s>-1){skipComment(e,s);r=r.slice(0,s)}return[r.trimEnd(),s]}function extractValue(e,A,t,r,s){if(r===0){throw new TomlError("document contains excessively nested structures. aborting.",{toml:e,ptr:A})}let n=e[A];if(n==="["||n==="{"){let[o,i]=n==="["?parseArray(e,A,r,s):parseInlineTable(e,A,r,s);if(t){i=skipVoid(e,i);if(e[i]===",")i++;else if(e[i]!==t){throw new TomlError("expected comma or end of structure",{toml:e,ptr:i})}}return[o,i]}let o;if(n==='"'||n==="'"){o=getStringEnd(e,A);let r=parseString(e,A,o);if(t){o=skipVoid(e,o);if(e[o]&&e[o]!==","&&e[o]!==t&&e[o]!=="\n"&&e[o]!=="\r"){throw new TomlError("unexpected character encountered",{toml:e,ptr:o})}o+=+(e[o]===",")}return[r,o]}o=skipUntil(e,A,",",t);let i=sliceAndTrimEndOf(e,A,o-+(e[o-1]===","));if(!i[0]){throw new TomlError("incomplete key-value declaration: no value specified",{toml:e,ptr:A})}if(t&&i[1]>-1){o=skipVoid(e,A+i[1]);o+=+(e[o]===",")}return[parseValue(i[0],e,A,s),o]}
+let ye=/^((0x[0-9a-fA-F](_?[0-9a-fA-F])*)|(([+-]|0[ob])?\d(_?\d)*))$/;let me=/^[+-]?\d(_?\d)*(\.\d(_?\d)*)?([eE][+-]?\d(_?\d)*)?$/;let De=/^[+-]?0[0-9_]/;function parseString(e,A){let t=e[A++];let r=t;let s=t==="'";let n=t===e[A]&&t===e[A+1];if(n){if(e[A+=2]==="\n")A++;else if(e[A]==="\r"&&e[A+1]==="\n")A+=2}let o="";let i=A;let a=0;for(let c=A;c<e.length;c++){t=e[c];if(n&&(t==="\n"||t==="\r"&&e[c+1]==="\n")){a=a&&3}else if(t<" "&&t!=="\t"||t===""){throw new TomlError("control characters are not allowed in strings",{toml:e,ptr:c})}else if((!a||a===3)&&t===r&&(!n||e[c+1]===r&&e[c+2]===r)){if(n){if(e[c+3]===r)c++;if(e[c+3]===r)c++}return[a?o:o+e.slice(i,c),c+(n?3:1)]}else if(!a){if(!s&&t==="\\"){o+=e.slice(i,i=c);a=1}}else if(a===1){if(t==="x"||t==="u"||t==="U"){let A=0;let r=t==="x"?2:t==="u"?4:8;for(let t=0;t<r;t++,c++){let t=e.charCodeAt(c+1);let r=t>=48&&t<=57?t-48:t>=65&&t<=70?t-65+10:t>=97&&t<=102?t-97+10:-1;if(r<0)throw new TomlError("invalid non-hex character in unicode escape",{toml:e,ptr:c+1});A=A<<4|r}if(A<0||A>1114111||A>=55296&&A<=57343){throw new TomlError("invalid unicode escape",{toml:e,ptr:c})}o+=String.fromCodePoint(A);i=c+1;a=0}else if(t===" "||t==="\t"){a=2}else{if(t==="b")o+="\b";else if(t==="t")o+="\t";else if(t==="n")o+="\n";else if(t==="f")o+="\f";else if(t==="r")o+="\r";else if(t==="e")o+="";else if(t==='"')o+='"';else if(t==="\\")o+="\\";else throw new TomlError("unrecognized escape sequence",{toml:e,ptr:c});i=c+1;a=0}}else if(t!==" "&&t!=="\t"){if(a===2){throw new TomlError("invalid escape: only line-ending whitespace may be escaped",{toml:e,ptr:i})}a=!s&&t==="\\"?1:0;i=c}}throw new TomlError("unfinished string",{toml:e,ptr:A})}function parseValue(e,A,t,r){if(e==="true")return true;if(e==="false")return false;if(e==="-inf")return-Infinity;if(e==="inf"||e==="+inf")return Infinity;if(e==="nan"||e==="+nan"||e==="-nan")return NaN;if(e==="-0")return r?0n:0;let s=ye.test(e);if(s||me.test(e)){if(De.test(e)){throw new TomlError("leading zeroes are not allowed",{toml:A,ptr:t})}e=e.replace(/_/g,"");let n=+e;if(isNaN(n)){throw new TomlError("invalid number",{toml:A,ptr:t})}if(s){if((s=!Number.isSafeInteger(n))&&!r){throw new TomlError("integer value cannot be represented losslessly",{toml:A,ptr:t})}if(s||r===true)n=BigInt(e)}return n}const n=new TomlDate(e);if(!n.isValid()){throw new TomlError("invalid value",{toml:A,ptr:t})}return n}
 /*!
  * Copyright (c) Squirrel Chat et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -168,7 +112,63 @@ function sliceAndTrimEndOf(e,A,t){let r=e.slice(A,t);let s=r.indexOf("#");if(s>-
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-let be=/^[a-zA-Z0-9-_]+[ \t]*$/;function parseKey(e,A,t="="){let r=A-1;let s=[];let n=e.indexOf(t,A);if(n<0){throw new TomlError("incomplete key-value: cannot find end of key",{toml:e,ptr:A})}do{let o=e[A=++r];if(o!==" "&&o!=="\t"){if(o==='"'||o==="'"){if(o===e[A+1]&&o===e[A+2]){throw new TomlError("multiline strings are not allowed in keys",{toml:e,ptr:A})}let i=getStringEnd(e,A);if(i<0){throw new TomlError("unfinished string encountered",{toml:e,ptr:A})}r=e.indexOf(".",i);let a=e.slice(i,r<0||r>n?n:r);let c=indexOfNewline(a);if(c>-1){throw new TomlError("newlines are not allowed in keys",{toml:e,ptr:A+r+c})}if(a.trimStart()){throw new TomlError("found extra tokens after the string part",{toml:e,ptr:i})}if(n<i){n=e.indexOf(t,i);if(n<0){throw new TomlError("incomplete key-value: cannot find end of key",{toml:e,ptr:A})}}s.push(parseString(e,A,i))}else{r=e.indexOf(".",A);let t=e.slice(A,r<0||r>n?n:r);if(!be.test(t)){throw new TomlError("only letter, numbers, dashes and underscores are allowed in keys",{toml:e,ptr:A})}s.push(t.trimEnd())}}}while(r+1&&r<n);return[s,skipVoid(e,n+1,true,true)]}function parseInlineTable(e,A,t,r){let s={};let n=new Set;let o;A++;while((o=e[A++])!=="}"&&o){if(o===","){throw new TomlError("expected value, found comma",{toml:e,ptr:A-1})}else if(o==="#")A=skipComment(e,A);else if(o!==" "&&o!=="\t"&&o!=="\n"&&o!=="\r"){let o;let i=s;let a=false;let[c,l]=parseKey(e,A-1);for(let t=0;t<c.length;t++){if(t)i=a?i[o]:i[o]={};o=c[t];if((a=Object.hasOwn(i,o))&&(typeof i[o]!=="object"||n.has(i[o]))){throw new TomlError("trying to redefine an already defined value",{toml:e,ptr:A})}if(!a&&o==="__proto__"){Object.defineProperty(i,o,{enumerable:true,configurable:true,writable:true})}}if(a){throw new TomlError("trying to redefine an already defined value",{toml:e,ptr:A})}let[g,Q]=extractValue(e,l,"}",t-1,r);n.add(g);i[o]=g;A=Q}}if(!o){throw new TomlError("unfinished table encountered",{toml:e,ptr:A})}return[s,A]}function parseArray(e,A,t,r){let s=[];let n;A++;while((n=e[A++])!=="]"&&n){if(n===","){throw new TomlError("expected value, found comma",{toml:e,ptr:A-1})}else if(n==="#")A=skipComment(e,A);else if(n!==" "&&n!=="\t"&&n!=="\n"&&n!=="\r"){let n=extractValue(e,A-1,"]",t-1,r);s.push(n[0]);A=n[1]}}if(!n){throw new TomlError("unfinished array encountered",{toml:e,ptr:A})}return[s,A]}
+function indexOfNewline(e,A=0,t=e.length){let r=e.indexOf("\n",A);if(e[r-1]==="\r")r--;return r<=t?r:-1}function skipComment(e,A){for(let t=A;t<e.length;t++){let r=e[t];if(r==="\n")return t;if(r==="\r"&&e[t+1]==="\n")return t+1;if(r<" "&&r!=="\t"||r===""){throw new TomlError("control characters are not allowed in comments",{toml:e,ptr:A})}}return e.length}function skipVoid(e,A,t,r){let s;while(1){while((s=e[A])===" "||s==="\t"||!t&&(s==="\n"||s==="\r"&&e[A+1]==="\n"))A++;if(r||s!=="#")break;A=skipComment(e,A)}return A}function skipUntil(e,A,t,r,s=false){if(!r){A=indexOfNewline(e,A);return A<0?e.length:A}for(let n=A;n<e.length;n++){let A=e[n];if(A==="#"){n=indexOfNewline(e,n)}else if(A===t){return n+1}else if(A===r||s&&(A==="\n"||A==="\r"&&e[n+1]==="\n")){return n}}throw new TomlError("cannot find end of structure",{toml:e,ptr:A})}
+/*!
+ * Copyright (c) Squirrel Chat et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+function sliceAndTrimEndOf(e,A,t){let r=e.slice(A,t);let s=r.indexOf("#");if(s>-1){skipComment(e,s);r=r.slice(0,s)}return[r.trimEnd(),s]}function extractValue(e,A,t,r,s){if(r===0){throw new TomlError("document contains excessively nested structures. aborting.",{toml:e,ptr:A})}let n=e[A];if(n==="["||n==="{"){let[o,i]=n==="["?parseArray(e,A,r,s):parseInlineTable(e,A,r,s);if(t){i=skipVoid(e,i);if(e[i]===",")i++;else if(e[i]!==t){throw new TomlError("expected comma or end of structure",{toml:e,ptr:i})}}return[o,i]}if(n==='"'||n==="'"){let[r,s]=parseString(e,A);if(t){s=skipVoid(e,s);if(e[s]&&e[s]!==","&&e[s]!==t&&e[s]!=="\n"&&e[s]!=="\r"){throw new TomlError("unexpected character encountered",{toml:e,ptr:s})}if(e[s]===",")s++}return[r,s]}let o=skipUntil(e,A,",",t);let i=sliceAndTrimEndOf(e,A,o-(e[o-1]===","?1:0));if(!i[0]){throw new TomlError("incomplete key-value declaration: no value specified",{toml:e,ptr:A})}if(t&&i[1]>-1){o=skipVoid(e,A+i[1]);if(e[o]===",")o++}return[parseValue(i[0],e,A,s),o]}
+/*!
+ * Copyright (c) Squirrel Chat et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+let ke=/^[a-zA-Z0-9-_]+[ \t]*$/;function parseKey(e,A,t="="){let r=A-1;let s=[];let n=e.indexOf(t,A);if(n<0){throw new TomlError("incomplete key-value: cannot find end of key",{toml:e,ptr:A})}do{let o=e[A=++r];if(o!==" "&&o!=="\t"){if(o==='"'||o==="'"){if(o===e[A+1]&&o===e[A+2]){throw new TomlError("multiline strings are not allowed in keys",{toml:e,ptr:A})}let[i,a]=parseString(e,A);r=e.indexOf(".",a);let c=e.slice(a,r<0||r>n?n:r);let l=indexOfNewline(c);if(l>-1){throw new TomlError("newlines are not allowed in keys",{toml:e,ptr:A+r+l})}if(c.trimStart()){throw new TomlError("found extra tokens after the string part",{toml:e,ptr:a})}if(n<a){n=e.indexOf(t,a);if(n<0){throw new TomlError("incomplete key-value: cannot find end of key",{toml:e,ptr:A})}}s.push(i)}else{r=e.indexOf(".",A);let t=e.slice(A,r<0||r>n?n:r);if(!ke.test(t)){throw new TomlError("only letter, numbers, dashes and underscores are allowed in keys",{toml:e,ptr:A})}s.push(t.trimEnd())}}}while(r+1&&r<n);return[s,skipVoid(e,n+1,true,true)]}function parseInlineTable(e,A,t,r){let s={};let n=new Set;let o;A++;while((o=e[A++])!=="}"&&o){if(o===","){throw new TomlError("expected value, found comma",{toml:e,ptr:A-1})}else if(o==="#")A=skipComment(e,A);else if(o!==" "&&o!=="\t"&&o!=="\n"&&o!=="\r"){let o;let i=s;let a=false;let[c,l]=parseKey(e,A-1);for(let t=0;t<c.length;t++){if(t)i=a?i[o]:i[o]={};o=c[t];if((a=Object.hasOwn(i,o))&&(typeof i[o]!=="object"||n.has(i[o]))){throw new TomlError("trying to redefine an already defined value",{toml:e,ptr:A})}if(!a&&o==="__proto__"){Object.defineProperty(i,o,{enumerable:true,configurable:true,writable:true})}}if(a){throw new TomlError("trying to redefine an already defined value",{toml:e,ptr:A})}let[g,Q]=extractValue(e,l,"}",t-1,r);n.add(g);i[o]=g;A=Q}}if(!o){throw new TomlError("unfinished table encountered",{toml:e,ptr:A})}return[s,A]}function parseArray(e,A,t,r){let s=[];let n;A++;while((n=e[A++])!=="]"&&n){if(n===","){throw new TomlError("expected value, found comma",{toml:e,ptr:A-1})}else if(n==="#")A=skipComment(e,A);else if(n!==" "&&n!=="\t"&&n!=="\n"&&n!=="\r"){let n=extractValue(e,A-1,"]",t-1,r);s.push(n[0]);A=n[1]}}if(!n){throw new TomlError("unfinished array encountered",{toml:e,ptr:A})}return[s,A]}
 /*!
  * Copyright (c) Squirrel Chat et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -224,7 +224,7 @@ function peekTable(e,A,t,r){let s=A;let n=t;let o;let i=false;let a;for(let A=0;
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-let Fe=/^[a-z0-9-_]+$/i;function extendedTypeOf(e){let A=typeof e;if(A==="object"){if(Array.isArray(e))return"array";if(e instanceof Date)return"date"}return A}function isArrayOfTables(e){for(let A=0;A<e.length;A++){if(extendedTypeOf(e[A])!=="object")return false}return e.length!=0}function formatString(e){return JSON.stringify(e).replace(/\x7f/g,"\\u007f")}function stringifyValue(e,A,t,r){if(t===0){throw new Error("Could not stringify the object: maximum object depth exceeded")}if(A==="number"){if(isNaN(e))return"nan";if(e===Infinity)return"inf";if(e===-Infinity)return"-inf";if(r&&Number.isInteger(e))return e.toFixed(1);return e.toString()}if(A==="bigint"||A==="boolean"){return e.toString()}if(A==="string"){return formatString(e)}if(A==="date"){if(isNaN(e.getTime())){throw new TypeError("cannot serialize invalid date")}return e.toISOString()}if(A==="object"){return stringifyInlineTable(e,t,r)}if(A==="array"){return stringifyArray(e,t,r)}}function stringifyInlineTable(e,A,t){let r=Object.keys(e);if(r.length===0)return"{}";let s="{ ";for(let n=0;n<r.length;n++){let o=r[n];if(n)s+=", ";s+=Fe.test(o)?o:formatString(o);s+=" = ";s+=stringifyValue(e[o],extendedTypeOf(e[o]),A-1,t)}return s+" }"}function stringifyArray(e,A,t){if(e.length===0)return"[]";let r="[ ";for(let s=0;s<e.length;s++){if(s)r+=", ";if(e[s]===null||e[s]===void 0){throw new TypeError("arrays cannot contain null or undefined values")}r+=stringifyValue(e[s],extendedTypeOf(e[s]),A-1,t)}return r+" ]"}function stringifyArrayTable(e,A,t,r){if(t===0){throw new Error("Could not stringify the object: maximum object depth exceeded")}let s="";for(let n=0;n<e.length;n++){s+=`${s&&"\n"}[[${A}]]\n`;s+=stringifyTable(0,e[n],A,t,r)}return s}function stringifyTable(e,A,t,r,s){if(r===0){throw new Error("Could not stringify the object: maximum object depth exceeded")}let n="";let o="";let i=Object.keys(A);for(let e=0;e<i.length;e++){let a=i[e];if(A[a]!==null&&A[a]!==void 0){let e=extendedTypeOf(A[a]);if(e==="symbol"||e==="function"){throw new TypeError(`cannot serialize values of type '${e}'`)}let i=Fe.test(a)?a:formatString(a);if(e==="array"&&isArrayOfTables(A[a])){o+=(o&&"\n")+stringifyArrayTable(A[a],t?`${t}.${i}`:i,r-1,s)}else if(e==="object"){let e=t?`${t}.${i}`:i;o+=(o&&"\n")+stringifyTable(e,A[a],e,r-1,s)}else{n+=i;n+=" = ";n+=stringifyValue(A[a],e,r,s);n+="\n"}}}if(e&&(n||!o))n=n?`[${e}]\n${n}`:`[${e}]`;return n&&o?`${n}\n${o}`:n||o}function stringify_stringify(e,{maxDepth:A=1e3,numbersAsFloat:t=false}={}){if(extendedTypeOf(e)!=="object"){throw new TypeError("stringify can only be called with an object")}let r=stringifyTable(0,e,"",A,t);if(r[r.length-1]!=="\n")return r+"\n";return r}
+let Re=/^[a-z0-9-_]+$/i;function extendedTypeOf(e){let A=typeof e;if(A==="object"){if(Array.isArray(e))return"array";if(e instanceof Date)return"date"}return A}function isArrayOfTables(e){for(let A=0;A<e.length;A++){if(extendedTypeOf(e[A])!=="object")return false}return e.length!=0}function formatString(e){return JSON.stringify(e).replace(/\x7f/g,"\\u007f")}function stringifyValue(e,A,t,r){if(t===0){throw new Error("Could not stringify the object: maximum object depth exceeded")}if(A==="number"){if(isNaN(e))return"nan";if(e===Infinity)return"inf";if(e===-Infinity)return"-inf";if(Number.isInteger(e)&&(r||!Number.isSafeInteger(e)))return e.toFixed(1);return e.toString()}if(A==="bigint"||A==="boolean"){return e.toString()}if(A==="string"){return formatString(e)}if(A==="date"){if(isNaN(e.getTime())){throw new TypeError("cannot serialize invalid date")}return e.toISOString()}if(A==="object"){return stringifyInlineTable(e,t,r)}if(A==="array"){return stringifyArray(e,t,r)}}function stringifyInlineTable(e,A,t){let r=Object.keys(e);if(r.length===0)return"{}";let s="{ ";for(let n=0;n<r.length;n++){let o=r[n];if(n)s+=", ";s+=Re.test(o)?o:formatString(o);s+=" = ";s+=stringifyValue(e[o],extendedTypeOf(e[o]),A-1,t)}return s+" }"}function stringifyArray(e,A,t){if(e.length===0)return"[]";let r="[ ";for(let s=0;s<e.length;s++){if(s)r+=", ";if(e[s]===null||e[s]===void 0){throw new TypeError("arrays cannot contain null or undefined values")}r+=stringifyValue(e[s],extendedTypeOf(e[s]),A-1,t)}return r+" ]"}function stringifyArrayTable(e,A,t,r){if(t===0){throw new Error("Could not stringify the object: maximum object depth exceeded")}let s="";for(let n=0;n<e.length;n++){s+=`${s&&"\n"}[[${A}]]\n`;s+=stringifyTable(0,e[n],A,t,r)}return s}function stringifyTable(e,A,t,r,s){if(r===0){throw new Error("Could not stringify the object: maximum object depth exceeded")}let n="";let o="";let i=Object.keys(A);for(let e=0;e<i.length;e++){let a=i[e];if(A[a]!==null&&A[a]!==void 0){let e=extendedTypeOf(A[a]);if(e==="symbol"||e==="function"){throw new TypeError(`cannot serialize values of type '${e}'`)}let i=Re.test(a)?a:formatString(a);if(e==="array"&&isArrayOfTables(A[a])){o+=(o&&"\n")+stringifyArrayTable(A[a],t?`${t}.${i}`:i,r-1,s)}else if(e==="object"){let e=t?`${t}.${i}`:i;o+=(o&&"\n")+stringifyTable(e,A[a],e,r-1,s)}else{n+=i;n+=" = ";n+=stringifyValue(A[a],e,r,s);n+="\n"}}}if(e&&(n||!o))n=n?`[${e}]\n${n}`:`[${e}]`;return n&&o?`${n}\n${o}`:n||o}function stringify_stringify(e,{maxDepth:A=1e3,numbersAsFloat:t=false}={}){if(extendedTypeOf(e)!=="object"){throw new TypeError("stringify can only be called with an object")}let r=stringifyTable(0,e,"",A,t);if(r[r.length-1]!=="\n")return r+"\n";return r}
 /*!
  * Copyright (c) Squirrel Chat et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -251,4 +251,4 @@ let Fe=/^[a-z0-9-_]+$/i;function extendedTypeOf(e){let A=typeof e;if(A==="object
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */const Se={parse:parse_parse,stringify:stringify_stringify,TomlDate:TomlDate,TomlError:TomlError};const Ne=JSON.parse('["3.14","3.13","3.12","3.11","3.10","3.9","3.8","3.7","3.6","3.5","3.4","3.3","3.2","3.1","3.0"]');async function resolve(e="./pyproject.toml"){const A=parse_parse(await Ce.readFile(e,"utf8"));const t=A?.project?.["requires-python"];const r=A?.tool?.poetry?.dependencies?.python;const s=t||r;if(!s){throw new Error("Could not find either 'project.requires-python' or 'tool.poetry.dependencies.python' in pyproject.toml")}return{max:maxSatisfying(Ne,s),min:minSatisfying(Ne,s)}}(async()=>{try{const{min:e,max:A}=await resolve();setOutput("min",e);setOutput("max",A)}catch(e){setFailed(e.message)}})();
+ */const be={parse:parse_parse,stringify:stringify_stringify,TomlDate:TomlDate,TomlError:TomlError};const Fe=JSON.parse('["3.14","3.13","3.12","3.11","3.10","3.9","3.8","3.7","3.6","3.5","3.4","3.3","3.2","3.1","3.0"]');async function resolve(e="./pyproject.toml"){const A=parse_parse(await Ce.readFile(e,"utf8"));const t=A?.project?.["requires-python"];const r=A?.tool?.poetry?.dependencies?.python;const s=t||r;if(!s){throw new Error("Could not find either 'project.requires-python' or 'tool.poetry.dependencies.python' in pyproject.toml")}return{max:maxSatisfying(Fe,s),min:minSatisfying(Fe,s)}}(async()=>{try{const{min:e,max:A}=await resolve();setOutput("min",e);setOutput("max",A)}catch(e){setFailed(e.message)}})();
